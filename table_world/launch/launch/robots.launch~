@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+  	<!-- LWR KUKA & HAND ROBO T-->
+  	<group ns="lwr">
+		<param name="robot_description" command="$(find xacro)/xacro.py $(find table_world)/urdf/lwr_ahand_init.xacro" />
+    		<include file="$(find table_world)/launch/launch/lwr_ahand.launch" >
+      			<arg name="init_pose" value="-x 0 -y 0 -z 0" />
+      			<arg name="robot_name"  value="lwr" />
+    		</include>
+  	</group> 
+
+ 	<!-- TABLE ROBOT -->
+  	<group ns="table">
+		<param name="robot_description" command="$(find xacro)/xacro.py '$(find table_description)/urdf/table_init.xacro'" />
+    		<include file="$(find table_world)/launch/launch/table.launch" >
+      			<arg name="init_pose" value="-x 1 -y 0 -z 0" />
+      			<arg name="robot_name"  value="table" />
+    		</include>
+  	</group>
+
+</launch>
+
+
+
+			<!--param name="tf_prefix" value="lwr_tf" /-->
+
+
+    		<!--param name="tf_prefix" value="table_tf" /-->
+

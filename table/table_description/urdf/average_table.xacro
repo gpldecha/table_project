@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<robot name="average_table" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+<!-- Import all Gazebo-customization elements, including Gazebo colors -->
+<xacro:include filename="$(find table_description)/urdf/table.gazebo" /> 
+
+<!-- Import Rviz colors -->
+<xacro:include filename="$(find table_description)/urdf/materials.xacro" />
+
+<xacro:property name="M_PI" value="3.14159265359"  /> 
+
+
+<xacro:property name="table_l"  value="0.5"    /> 
+<xacro:property name="table_h"  value="0.9"   /> 
+<xacro:property name="table_w"  value="0.04"   />
+
+<xacro:property name="leg_l"  value="0.02"    /> 
+<xacro:property name="leg_h"  value="0.02"   /> 
+<xacro:property name="leg_w"  value="0.73"   />
+
+<xacro:macro name="box_I" params="m w h d">
+    <inertia ixx="${1/12 * m * (d*d  + h * h)}" ixy="0.0" ixz="0.0" iyy="${1/12 * m * (h * h + w * w)}" iyz="0.0" izz="${1/12 * m * (w * w + d * d)}" />
+</xacro:macro>
+
+<xacro:macro name="leg" params="prefix rx ry zshift">
+	<link name="${prefix}_leg">
+      		<visual>
+		<origin xyz="0 0 ${zshift}" rpy="0 0 0"/>
+        		<geometry>
+	        		<box size="${leg_l} ${leg_h} ${leg_w}"/>	
+        		</geometry>
+ 			<material name="Grey">
+ 				<color rgba="0.4 0.4 0.4 1"/>
+        		</material>
+      		</visual>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="1"/>
+			<xacro:box_I m="0.25" w="${leg_l}" h="${leg_h}" d="${leg_w}"/>
+		</inertial>
+
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${leg_l} ${leg_h} ${leg_w}"/>	
+			</geometry>
+  		</collision>
+	</link>
+	<joint name="link_${prefix}_leg" type="fixed">
+		<origin xyz="${rx * table_l * 0.5 - rx * leg_l * 0.5 } ${ry * table_h * 0.5 - ry * leg_h * 0.5} ${-0.5 * table_w - 0.5 * leg_w}" rpy="0 0 0"/>
+		<parent link="average_table_link"/>
+		<child link="${prefix}_leg"/>
+	 </joint>
+</xacro:macro>
+
+
+<xacro:macro name="table">
+
+
+<link name="average_table_link">
+	<visual>
+		<origin xyz="0 0 ${-table_w * 0.5}" rpy="0 0 0"/>
+		<geometry>
+			<box size="${table_l} ${table_h} ${table_w}"/>	
+		</geometry>
+ 		<material name="Wood">
+ 			<color rgba="1 0.88 0.56 1"/>
+        	</material>
+        </visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="1"/>
+		<xacro:box_I m="1.0" w="${table_w}" h="${table_h}" d="${table_l}"/>
+	</inertial>
+
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${table_l} ${table_h} ${table_w}"/>	
+		</geometry>
+  	</collision>
+
+</link>
+
+
+<xacro:leg prefix="front_left"  rx="1"  ry="1"  zshift="${-table_w * 0.5}" />
+<xacro:leg prefix="front_right" rx="1"  ry="-1" zshift="${-table_w * 0.5}" />
+<xacro:leg prefix="rear_left"   rx="-1" ry="1"  zshift="${-table_w * 0.5}" />
+<xacro:leg prefix="rear_right"  rx="-1" ry="-1" zshift="${-table_w * 0.5}" />
+
+</xacro:macro>
+   
+
+<xacro:table/>
+
+</robot>
+

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="use_rviz" 	default="True" />
+	<arg name="origin"	default="0 0 0"/>
+	<arg name="orientation"	default="0 0 0 1"/>
+
+	<arg name="save_path"			default="/home/guillaume/roscode/catkin_ws/src/table/table_description/saved"/>
+	<arg name="load_saved"			default="False"/>
+
+	<arg name="use_table_broadcaster" 	default="False"/>
+	<arg name="use_broadcaster"		default="True"/>
+
+	<group ns="big_table">
+
+		<param name="robot_description" command="$(find xacro)/xacro.py '$(find table_description)/urdf/big_table.xacro'" />
+		<node  name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+		<node  name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+		
+		<group if="$(arg use_table_broadcaster)">
+			<node name="big_table_broadcaster" type="table_broadcaster" pkg="table_broadcaster" 
+			      args="-fixed_frame world -target_frame_vision big_table_root -target_frame_rviz table_top -origin $(arg origin) -orientation $(arg orientation) 				    -save $(arg save_path) -load $(arg load_saved) -rate 100" output="screen"
+			/>
+		</group>
+
+		<group if="$(arg use_broadcaster)">
+			<node name="big_table_broadcaster" pkg="tf" type="static_transform_publisher" args="$(arg origin) $(arg orientation) world table_top 100" />
+		</group>
+
+	</group>
+
+
+	<group if="$(arg use_rviz)">	
+		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find table_description)/launch/rviz/big_table.rviz" required="true" />
+	</group>
+
+</launch>

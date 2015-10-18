@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<robot name="shelf" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+<!-- Import Rviz colors -->
+<xacro:include filename="$(find table_description)/urdf/materials.xacro" />
+
+<xacro:property name="base_l"  value="0.55"   /> 
+<xacro:property name="base_h"  value="0.8"   /> 
+<xacro:property name="base_w"  value="0.145" />
+
+<xacro:property name="bar_l"  value="0.06"/> 
+<xacro:property name="bar_h"  value="0.03" /> 
+<xacro:property name="bar_w"  value="1.44" />
+
+<xacro:property name="hbar_l"  value="0.025"/> 
+<xacro:property name="hbar_h"  value="0.72" /> 
+<xacro:property name="hbar_w"  value="0.08" />
+
+<xacro:property name="shelf_l"  value="0.352"/> 
+<xacro:property name="shelf_h"  value="0.72" /> 
+<xacro:property name="shelf_w"  value="0.025" />
+
+<xacro:property name="pi" value="3.14159265359"/>
+
+<xacro:macro name="box_I" params="m w h d">
+    <inertia ixx="${1/12 * m * (d*d  + h * h)}" ixy="0.0" ixz="0.0" iyy="${1/12 * m * (h * h + w * w)}" iyz="0.0" izz="${1/12 * m * (w * w + d * d)}" />
+</xacro:macro>
+
+<xacro:macro name="mybox" params="name l h w color">
+   <link name="${name}">
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${l} ${h} ${w}"/>	
+		</geometry>
+ 		<material name="${color}"/>
+        </visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="1"/>
+		<xacro:box_I m="1.0" w="${w}" h="${h}" d="${l}"/>
+	</inertial>
+
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${l} ${h} ${w}"/>	
+		</geometry>
+  	</collision>
+  </link>
+</xacro:macro>
+
+
+<!-- MACRO for One Book Shelf -->
+<xacro:macro name="shelf" params="name">
+
+<xacro:mybox name="${name}" l="${shelf_l}" h="${shelf_h}" w="${shelf_w}" color="Grey"/>
+   
+<link name="${name}_side_one">
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+            		<mesh filename="package://table_description/meshes/shelf_part2.dae"/>
+          	</geometry>
+        </visual>
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="1"/>
+		<xacro:box_I m="1.0" w="${shelf_w}" h="${shelf_h}" d="${shelf_l}"/>
+	</inertial>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+            		<mesh filename="package://table_description/meshes/shelf_part2.dae"/>
+          	</geometry>
+  	</collision>
+</link>
+
+<link name="${name}_side_two">
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+            		<mesh filename="package://table_description/meshes/shelf_part2.dae"/>
+          	</geometry>
+        </visual>
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="1"/>
+		<xacro:box_I m="1.0" w="${shelf_w}" h="${shelf_h}" d="${shelf_l}"/>
+	</inertial>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+            		<mesh filename="package://table_description/meshes/shelf_part2.dae"/>
+          	</geometry>
+  	</collision>
+</link>
+
+
+<xacro:mybox name="${name}_back_bar" l="0.005" h="${shelf_h}" w="0.02" color="Blue"/>
+
+<joint name="link_${name}_side_one" type="fixed">
+	<origin xyz="${0.5*shelf_l} ${-0.5*shelf_h} ${-0.5*shelf_w+0.001}" rpy="0 0 0"/>
+	<parent link="${name}"/>
+	<child  link="${name}_side_one"/>
+</joint>
+
+<joint name="link_${name}_side_two" type="fixed">
+	<origin xyz="${0.5*shelf_l} ${0.5*shelf_h} ${-0.5*shelf_w+0.001}" rpy="0 0 0"/>
+	<parent link="${name}"/>
+	<child  link="${name}_side_two"/>
+</joint>
+
+<joint name="link_${name}_back_bar" type="fixed">
+	<origin xyz="${0.5*shelf_l} 0 ${0.5*shelf_w+0.5*0.02}" rpy="0 0 0"/>
+	<parent link="${name}"/>
+	<child  link="${name}_back_bar"/>
+</joint>
+</xacro:macro>
+
+
+
+<xacro:macro name="book_shelf">
+
+	<xacro:mybox name="base" l="${base_l}" h="${base_h}" w="${base_w}" color="Wood"/>
+	
+	<xacro:mybox name="left_bar" l="${bar_l}" h="${bar_h}" w="${bar_w}" color="Grey"/>
+
+	<joint name="link_left_bar" type="fixed">
+		<origin xyz="0 ${-0.5 * base_h + bar_h} ${0.5 * bar_w + 0.5 * base_w}" rpy="0 0 0"/>
+		<parent link="base"/>
+		<child  link="left_bar"/>
+	</joint>
+
+	<xacro:mybox name="right_bar" l="${bar_l}" h="${bar_h}" w="${bar_w}" color="Grey"/>
+
+	<joint name="link_right_bar" type="fixed">
+		<origin xyz="0 ${0.5 * base_h - bar_h} ${0.5 * bar_w + 0.5 * base_w}" rpy="0 0 0"/>
+		<parent link="base"/>
+		<child  link="right_bar"/>
+	</joint>
+
+
+	<xacro:mybox name="bot_bar" l="${hbar_l}" h="${hbar_h}" w="${hbar_w}" color="Blue"/>
+
+	<joint name="link_bot_bar" type="fixed">
+		<origin xyz="0 0 ${0.5*hbar_w + 0.24}" rpy="0 0 0"/>
+		<parent link="base"/>
+		<child  link="bot_bar"/>
+	</joint>
+
+	<xacro:mybox name="top_bar" l="${hbar_l}" h="${hbar_h}" w="${hbar_w}" color="Blue"/>
+
+	<joint name="link_top_bar" type="fixed">
+		<origin xyz="0 0 ${bar_w + 0.5 * base_w - 0.5 * hbar_w}" rpy="0 0 0"/>
+		<parent link="base"/>
+		<child  link="top_bar"/>
+	</joint>
+
+</xacro:macro>
+
+
+<xacro:book_shelf/>
+
+<xacro:shelf name="shelf_one"/>
+
+<xacro:shelf name="shelf_two"/>
+
+<xacro:shelf name="shelf_three"/>
+	
+<joint name="link_shelf_one" type="fixed">
+	<origin xyz="${0.5*shelf_l} 0 ${0.5*base_w + 0.58}" rpy="0 0 ${pi}"/>
+	<parent link="base"/>
+	<child  link="shelf_one"/>
+</joint>
+
+<joint name="link_shelf_two" type="fixed">
+	<origin xyz="${0.5*shelf_l} 0 ${0.5*base_w + 0.93}" rpy="0 0 ${pi}"/>
+	<parent link="base"/>
+	<child  link="shelf_two"/>
+</joint>
+
+<joint name="link_shelf_three" type="fixed">
+	<origin xyz="${0.5*shelf_l} 0 ${0.5*base_w + 1.33}" rpy="0 0 ${pi}"/>
+	<parent link="base"/>
+	<child  link="shelf_three"/>
+</joint>
+
+
+</robot>
+

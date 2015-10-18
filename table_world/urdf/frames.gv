@@ -1,0 +1,10 @@
+digraph G {
+"lwr_base_link" -> "lwr_1_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.179 \nBuffer length: 4.960 sec\n"];
+"world" -> "lwr_base_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.691 \nBuffer length: 4.960 sec\n"];
+"lwr_1_link" -> "lwr_2_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.179 \nBuffer length: 4.960 sec\n"];
+"lwr_2_link" -> "lwr_3_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.179 \nBuffer length: 4.960 sec\n"];
+"lwr_3_link" -> "lwr_4_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.179 \nBuffer length: 4.960 sec\n"];
+"lwr_4_link" -> "lwr_5_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.179 \nBuffer length: 4.960 sec\n"];
+"lwr_5_link" -> "lwr_6_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.179 \nBuffer length: 4.960 sec\n"];
+"lwr_6_link" -> "lwr_7_link"[label="Broadcaster: /lwr/robot_state_publisher\nAverage rate: 50.202 Hz\nMost recent transform: 26.179 \nBuffer length: 4.960 sec\n"];
+}

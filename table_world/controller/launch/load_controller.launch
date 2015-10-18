@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+	
+	<arg name="controller" default="OneTaskInverseKinematics" doc="Name of the controller to be loaded (e.g. OneTaskInverseKinematics)" />
+	<arg name="stopped_controllers" default="" doc="Additional controllers to be loaded, but not started (can be started later with controller_manager)" />
+
+	<rosparam ns="lwr" file="$(find lwr_controllers)/config/lwr_controllers.yaml" command="load"/>
+
+	<rosparam ns="lwr" file="$(find allegro_hand_controllers)/config/allegro_hand_controllers.yaml" command="load"/>
+
+	<node ns="lwr" name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+	      output="screen"  args="lwr/joint_state_controller lwr/$(arg controller) ahand/TaskInverseKinematics" /> 
+	
+	<node  name="controller_spawner_stopped" pkg="controller_manager" type="spawner" respawn="false"
+		output="screen"  args="--stopped $(arg stopped_controllers)"/> 
+	
+</launch>

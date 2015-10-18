@@ -1,0 +1,86 @@
+<launch>
+	<!-- LAUNCH INTERFACE -->
+	
+	<!-- in case you have different robot configurations -->
+	<arg name="robot_name" default="single_lwr_robot"/>
+
+	<!-- the default is the simulator -->
+	<arg name="use_lwr_sim" default="true"/>
+	<arg name="use_rviz" 	default="true"/>
+	<arg name="gui" 	default="true" />
+
+
+	
+	<arg name="stopped_controllers" default="gravity_compensation_controller one_task_inverse_kinematics"/>
+
+	<!-- in case you want to load  from here, it might be hard with the real HW though -->
+	<arg name="load_moveit" default="false"/>
+
+	<!-- LAUNCH IMPLEMENTATION -->
+
+	<!-- the urdf/sdf parameter -->
+	<!--param name="robot_description" command="$(find xacro)/xacro.py $(find single_lwr_robot)/robot/$(arg robot_name).urdf.xacro"/-->
+
+  
+	<param name="robot_description" command="$(find xacro)/xacro.py $(find table_world)/urdf/lwr_ahand_init.xacro" />
+    	<include file="$(find table_world)/launch/launch/lwr_ahand.launch" >
+      		<arg name="init_pose" value="-x 0 -y 0 -z 0" />
+    	</include>
+  	
+	<!-- joint and robot state publishers of the full robot description -->
+	<!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+		<rosparam param="source_list">[/lwr/joint_states]</rosparam>
+	</node>
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/-->
+	
+	<group if="$(arg use_rviz)">
+		<node name="lwr_rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(find single_lwr_launch)/launch/rviz_config.rviz" output="screen"/>
+	</group>
+
+
+	<!--group if="$(arg use_rviz)">
+		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find table_world)/launch/table_world.rviz" required="true" />
+	</group-->
+
+
+	<!-- robot simulation uses the full robot description -->
+	<group if="$(arg use_lwr_sim)">
+		<!-- spawn the robot in gazebo -->
+		<!--node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model $(arg robot_name)"  respawn="false" output="screen" /-->
+
+		<!-- enable/disable gui at will, the rviz listens to the simulation -->
+		<include file="$(find gazebo_ros)/launch/empty_world.launch">
+			<arg name="world_name" value="$(find single_lwr_robot)/worlds/simple_environment.world"/>
+			<arg name="paused" value="false"/>
+			<arg name="use_sim_time" value="true"/>
+			<arg name="gui" value="true"/>
+			<arg name="headless" value="false"/>
+			<arg name="debug" value="false"/>
+
+		</include>
+	</group>
+
+	<!-- load moveit configuration -->
+    <group if="$(arg load_moveit)">
+        <include file="$(find single_lwr_moveit)/launch/move_group.launch">
+            <arg name="allow_trajectory_execution" value="true"/>  
+            <arg name="fake_execution" value="false"/>
+            <arg name="info" value="true"/>
+            <arg name="debug" value="false"/>
+        </include>
+
+		<!-- run Rviz and load the default config to see the state of the move_group node -->
+		<include file="$(find single_lwr_moveit)/launch/moveit_rviz.launch">
+			<arg name="config" value="true"/>
+			<arg name="debug" value="false"/>
+		</include>
+    </group>
+
+
+	<!-- load robotHW configurations to rosparam server -->
+	<rosparam command="load" file="$(find single_lwr_robot)/config/hw_interface.yaml"/>
+
+    	<!-- load all controller configurations to rosparam server -->
+    	<rosparam file="$(find single_lwr_robot)/config/controllers.yaml" command="load"/>
+
+</launch>

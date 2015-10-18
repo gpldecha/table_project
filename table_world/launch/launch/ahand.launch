@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="robot_name" default="ahand"/>
+    <arg name="init_pose"/>
+
+    <node name="spawn_ahand_model" pkg="gazebo_ros" type="spawn_model"
+     args="$(arg init_pose) -urdf -param /ahand/robot_description -model $(arg robot_name)"
+     respawn="false" output="screen" />
+
+
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"  />
+
+</launch>

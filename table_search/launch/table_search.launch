@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- arg -->
+	<arg name="gui" 		default="False" />
+	<arg name="hand_frame_vision" 	value="/hand_root"/>
+	<arg name="world_frame" 	value="/world"/>
+        <arg name="hand_frame"		value="/hand"/>
+	<arg name="record_folder"	value="$(find record)/saved/"/>
+
+	<arg name="load_tf_folder"	value="/home/guillaume/roscode/catkin_ws/src/table_search/saved"/>
+	<arg name="load_save"		value="True"/>
+	
+	<param name="use_gui" value="$(arg gui)"/>
+
+	
+	<!-- launch optitrack -->
+	<include file="$(find optitrack)/launch/optitrack.launch" />
+
+	<!--0.707107 0.707107-->	
+
+	<!-- small table URDF -->
+	<include file="$(find table_description)/launch/table.launch">
+	  	<arg name="use_rviz" 			value="False"/>
+		<arg name="origin"   			value="-2 -1 0"/>
+		<arg name="orientation"			value="0 0 0 1"/>	
+		<arg name="use_table_broadcaster" 	value="True"/>
+		<arg name="use_broadcaster" 		value="False"/>
+		<arg name="save_path"			value="$(arg load_tf_folder)"/>
+		<arg name="load_saved"			value="$(arg load_save)"/>
+	</include>	
+
+	<!-- big table URDF -->
+	<include file="$(find table_description)/launch/big_table.launch">
+	  	<arg name="use_rviz"			value="False"/>
+		<arg name="origin"   			value="1 0 0"/>	
+		<arg name="orientation"			value="0 0 -0.707107 0.707107"/>		
+		<arg name="use_table_broadcaster" 	value="True"/>
+		<arg name="use_broadcaster" 		value="False"/>
+		<arg name="save_path"			value="$(arg load_tf_folder)"/>
+		<arg name="load_saved"			value="$(arg load_save)"/>
+	</include>	
+
+	<!-- book shelf URDF -->
+	<include file="$(find table_description)/launch/book_shelf.launch">
+	  	<arg name="use_rviz" 			value="False"/>	
+		<arg name="offset"   			value="0 0 -1.5125"/>	
+		<arg name="orientation"			value="0 0 -0.707107 0.707107"/>		
+		<arg name="use_table_broadcaster" 	value="True"/>
+		<arg name="use_broadcaster" 		value="False"/>	
+		<arg name="save_path"			value="$(arg load_tf_folder)"/>
+		<arg name="load_saved"			value="$(arg load_save)"/>
+	</include>	
+
+
+	<!-- Rviz -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find table_search)/launch/rviz/table_search.rviz" required="true" />
+
+	<!-- hand node -->
+	<node name="hand_model" pkg="sensor_models" type="sensor_models" args="-fixed_frame $(arg world_frame) -target_frame_vision $(arg hand_frame_vision)" output="screen"/>
+
+	<!-- record node -->
+	<!--node name="record" pkg="record" type="record" args="-fixed_frame $(arg world_frame) -target_frame visualization_marker_hand_model -record_folder $(arg record_folder)" output="screen"/-->
+
+</launch>
+
+

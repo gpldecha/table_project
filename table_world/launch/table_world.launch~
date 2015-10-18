@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="gui" default="False" />
+	<arg name="controller" default="OneTaskInverseKinematics" />	
+	<arg name="stopped_controllers" default="" />
+	
+	<arg name="use_lwr_sim" default="false"/>
+	<arg name="use_rviz" 	default="true"/>
+
+
+	<!--load controller -->
+   	<include file="$(find table_world)/controller/launch/load_controller.launch">
+		<arg name="controller" value="$(arg controller)" />
+		<arg name="stopped_controllers" value="$(arg stopped_controllers)" />
+	</include>
+
+  	<!--include file="$(find table_world)/launch/launch/robots.launch"/-->	
+  	<include file="$(find table_world)/launch/launch/robots.launch"/>	
+
+	<group if="$(arg use_rviz)">
+		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find table_world)/launch/table_world.rviz" required="true" />
+	</group>
+
+	<group if="$(arg use_lwr_sim)">
+		<!-- start World -->
+  		<include file="$(find table_world)/launch/empty_world.launch">
+    			<arg name="world_name" value="worlds/empty.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+    			<arg name="paused" value="false"/>
+    			<arg name="use_sim_time" value="false"/>
+    			<arg name="gui" value="true"/>
+    			<arg name="headless" value="false"/>
+    			<arg name="debug" value="false"/>
+  		</include>
+
+		 <!-- include our robots -->
+
+	</group>
+
+	<node name="lwr_listener" pkg="lwr_listener" type="lwr_listener"/>
+	
+	<node name="planner" pkg="planner" type="planner_server"/>
+
+
+</launch>

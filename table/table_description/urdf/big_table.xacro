@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+<robot name="big_table" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+<!-- Import all Gazebo-customization elements, including Gazebo colors -->
+<xacro:include filename="$(find table_description)/urdf/table.gazebo" /> 
+
+<!-- Import Rviz colors -->
+<xacro:include filename="$(find table_description)/urdf/materials.xacro" />
+
+
+<xacro:property name="table_top_l"  value="1.2"   /> 
+<xacro:property name="table_top_h"  value="0.6"   /> 
+<xacro:property name="table_top_w"  value="0.025" />
+
+<xacro:property name="table_bot_l"  value="1.15"  /> 
+<xacro:property name="table_bot_h"  value="0.5"   /> 
+<xacro:property name="table_bot_w"  value="0.025" />
+
+<xacro:property name="top_bar_l"  value="0.025"   /> 
+<xacro:property name="top_bar_h"  value="0.6"     /> 
+<xacro:property name="top_bar_w"  value="0.025"   />
+
+<xacro:property name="leg_l"  value="0.025"   /> 
+<xacro:property name="leg_h"  value="0.05"  /> 
+<xacro:property name="leg_w"  value="0.65"   />
+
+<xacro:property name="sup_l"  value="0.025"   /> 
+<xacro:property name="sup_h"  value="0.545"  /> 
+<xacro:property name="sup_w"  value="0.025"   />
+
+
+
+
+<xacro:macro name="box_I" params="m w h d">
+    <inertia ixx="${1/12 * m * (d*d  + h * h)}" ixy="0.0" ixz="0.0" iyy="${1/12 * m * (h * h + w * w)}" iyz="0.0" izz="${1/12 * m * (w * w + d * d)}" />
+</xacro:macro>
+
+<!-- support -->
+<xacro:macro name="sup" params="prefix rx">
+	<link name="${prefix}_sup">
+      		<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+        		<geometry>
+	        		<box size="${sup_l} ${sup_h} ${sup_w}"/>	
+        		</geometry>
+ 			<material name="Grey"/>
+      		</visual>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="1"/>
+			<xacro:box_I m="0.25" w="${sup_l}" h="${sup_h}" d="${sup_w}"/>
+		</inertial>
+
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${sup_l} ${sup_h} ${sup_w}"/>	
+			</geometry>
+  		</collision>
+
+
+	</link>
+	<joint name="link_${prefix}_sup" type="fixed">
+		<origin xyz="${rx*0.5*table_top_l -rx*0.5*top_bar_l} 0 ${-table_top_w-table_bot_w-leg_w-0.5*sup_w}" rpy="0 0 0"/>
+		<parent link="table_top"/>
+		<child link="${prefix}_sup"/>
+	 </joint>
+</xacro:macro>
+
+
+<!-- lefg -->
+<xacro:macro name="leg" params="prefix rx">
+	<link name="${prefix}_leg">
+      		<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+        		<geometry>
+	        		<box size="${leg_l} ${leg_h} ${leg_w}"/>	
+        		</geometry>
+ 			<material name="Grey"/>
+      		</visual>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="1"/>
+			<xacro:box_I m="0.25" w="${leg_l}" h="${leg_h}" d="${leg_w}"/>
+		</inertial>
+
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${leg_l} ${leg_h} ${leg_w}"/>	
+			</geometry>
+  		</collision>
+
+
+	</link>
+	<joint name="link_${prefix}_leg" type="fixed">
+		<origin xyz="${rx*0.5*table_top_l -rx*0.5*leg_l} ${-0.5*table_top_h + 0.5* leg_h} ${-0.5*leg_w-table_top_w-table_bot_w}" rpy="0 0 0"/>
+		<parent link="table_top"/>
+		<child link="${prefix}_leg"/>
+	 </joint>
+</xacro:macro>
+
+<!-- top bar -->
+<xacro:macro name="top_bar" params="prefix rx">
+	<link name="${prefix}_top_bar">
+      		<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+        		<geometry>
+	        		<box size="${top_bar_l} ${top_bar_h} ${top_bar_w}"/>	
+        		</geometry>
+ 			<material name="Grey"/>
+      		</visual>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="1"/>
+			<xacro:box_I m="0.25" w="${top_bar_l}" h="${top_bar_h}" d="${top_bar_w}"/>
+		</inertial>
+
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${top_bar_l} ${top_bar_h} ${top_bar_w}"/>	
+			</geometry>
+  		</collision>
+	</link>
+
+	<joint name="link_${prefix}_top_bar" type="fixed">
+		<origin xyz="${rx*0.5*table_top_l -rx*0.5*top_bar_l} 0  ${-0.5*table_top_w-top_bar_w }" rpy="0 0 0"/>
+		<parent link="table_top"/>
+		<child link="${prefix}_top_bar"/>
+	 </joint>
+
+</xacro:macro>
+
+<xacro:macro name="big_table">
+
+
+<link name="table_top">
+	<visual>
+		<origin xyz="0 0 ${-table_top_w * 0.5}" rpy="0 0 0"/>
+		<geometry>
+			<box size="${table_top_l} ${table_top_h} ${table_top_w}"/>	
+		</geometry>
+ 		<material name="Wood"/>
+        </visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="1"/>
+		<xacro:box_I m="1.0" w="${table_top_w}" h="${table_top_h}" d="${table_top_l}"/>
+	</inertial>
+
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${table_top_l} ${table_top_h} ${table_top_w}"/>	
+		</geometry>
+  	</collision>
+</link>
+
+
+<link name="table_bottom">
+	<visual>
+		<origin xyz="0 0 ${-table_bot_w * 0.5}" rpy="0 0 0"/>
+		<geometry>
+			<box size="${table_bot_l} ${table_bot_h} ${table_bot_w}"/>	
+		</geometry>
+ 		<material name="Grey"/>
+        </visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="1"/>
+		<xacro:box_I m="1.0" w="${table_bot_w}" h="${table_bot_h}" d="${table_bot_l}"/>
+	</inertial>
+
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${table_bot_l} ${table_bot_h} ${table_bot_w}"/>	
+		</geometry>
+  	</collision>
+</link>
+
+<joint name="link_table_top_bottom" type="fixed">
+	<origin xyz="0 ${-0.5*(table_top_h - table_bot_h)} ${-0.5 * table_top_w - 0.5 * table_bot_w}" rpy="0 0 0"/>
+	<parent link="table_top"/>
+	<child link="table_bottom"/>
+</joint>
+
+
+
+<xacro:top_bar prefix="left"   rx="1"/>
+<xacro:top_bar prefix="right"  rx="-1"/>
+
+<xacro:leg prefix="left"   rx="1"/>
+<xacro:leg prefix="right"  rx="-1"/>
+
+<xacro:sup prefix="left"   rx="1"/>
+<xacro:sup prefix="right"  rx="-1"/>
+
+</xacro:macro>
+   
+<xacro:big_table/>
+
+</robot>
+

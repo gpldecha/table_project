@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot>
+
+  <gazebo reference="table_link">
+    <material>Gazebo/Wood</material>
+  </gazebo>
+
+  <gazebo reference="front_right_leg">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <gazebo reference="front_left_leg">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <gazebo reference="rear_left_leg">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <gazebo reference="rear_right_leg">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+</robot>

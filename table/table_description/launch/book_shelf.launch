@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="use_rviz" 			default="True" />
+	<arg name="origin"			default="1 1 0"/>
+	<arg name="orientation"			default="0 0 0 1"/>
+	<arg name="offset"			default="0 0 0"/>
+
+	<arg name="save_path"			default="/home/guillaume/roscode/catkin_ws/src/table/table_description/saved"/>
+	<arg name="load_saved"			default="True"/>
+
+	<arg name="use_table_broadcaster" 	default="False"/>
+	<arg name="use_broadcaster"		default="True"/>
+
+	<group ns="book_shelf">
+		<param name="robot_description" command="$(find xacro)/xacro.py '$(find table_description)/urdf/book_shelf.xacro'" />
+		<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+		<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+
+		<group if="$(arg use_table_broadcaster)">
+			<node name="book_shelf_broadcaster" type="table_broadcaster" pkg="table_broadcaster" 
+			      args="-fixed_frame world -target_frame_vision book_shelf_root -target_frame_rviz base -origin $(arg origin) -orientation $(arg orientation) -offset $(arg offset) -save $(arg save_path) 
+				    -load $(arg load_saved) -rate 100" output="screen"
+			/>
+		</group>
+		<group if="$(arg use_broadcaster)">
+		<node  name="book_shelf_broadcaster"  pkg="tf" type="static_transform_publisher" args="$(arg origin) $(arg orientation) world base 100" />
+		</group>
+	</group>
+
+	<group if="$(arg use_rviz)">	
+		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find table_description)/launch/rviz/book_shelf.rviz" required="true" />
+	</group>
+
+</launch>
