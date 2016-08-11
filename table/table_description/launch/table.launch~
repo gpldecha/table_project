@@ -6,6 +6,7 @@
 	<arg name="table_urdf_name"		default="table"/>
 
 
+table_name_urdf
 	<arg name="use_table_broadcaster" 	default="False"/>
 	<arg name="use_broadcaster"		default="True"/>
 
